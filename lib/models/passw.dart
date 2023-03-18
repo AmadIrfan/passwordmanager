@@ -1,7 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:passwordmanager/db/db_helper.dart';
 
 class Password with ChangeNotifier {
   String? id;
+  String? uid;
   String? webSite;
   String? uName;
   String? password;
@@ -10,6 +13,7 @@ class Password with ChangeNotifier {
       {required this.webSite,
       required this.uName,
       required this.id,
+      required this.uid,
       required this.password,
       required this.addedDate});
   Password.named({required this.uName, required this.password});
@@ -17,7 +21,8 @@ class Password with ChangeNotifier {
 }
 
 class PasswordData with ChangeNotifier {
-  final List<Password> _itemList = [
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  late List<Password> _itemList = [
     // Password(
     //     id: DateTime.now().toString(),
     //     webSite: 'webSite',
@@ -63,10 +68,20 @@ class PasswordData with ChangeNotifier {
         id: DateTime.now().toString(),
         webSite: pas.webSite,
         uName: pas.uName,
+        uid: pas.uid,
         password: pas.password,
         addedDate: pas.addedDate);
     _itemList.insert(0, temp);
     notifyListeners();
+    Map<String, Object> data = {
+      "id": temp.id!,
+      'uid': _auth.currentUser!.uid,
+      "name": temp.uName!,
+      "web": temp.webSite!,
+      "password": temp.password!,
+      "date": temp.addedDate!.toString(),
+    };
+    Password_DbHelper.insertData("password", data);
   }
 
   String getChar(String web) {
@@ -95,6 +110,24 @@ class PasswordData with ChangeNotifier {
 
   deletePass(String id) {
     _itemList.removeWhere((element) => element.id == id);
+    notifyListeners();
+  }
+
+  Future<void> fatchDataDB() async {
+    final dataList = await Password_DbHelper.getData("password");
+    _itemList = dataList
+        .map(
+          (e) => Password(
+            webSite: e["web"],
+            uName: e["name"],
+            id: e["id"],
+            uid: e['uid'],
+            password: e["password"],
+            addedDate: DateTime.parse(e["id"]),
+          ),
+        )
+        .toList();
+
     notifyListeners();
   }
 }

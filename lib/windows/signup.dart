@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import 'package:passwordmanager/models/auth.dart';
+import 'package:provider/provider.dart';
 import '../windows/login.dart';
 import '../styles/properties.dart';
 
@@ -11,40 +14,69 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-  // @override
-  // void initState() {
-  //   SystemChrome.setPreferredOrientations([
-  //     DeviceOrientation.portraitDown,
-  //     DeviceOrientation.portraitUp,
-  //     // DeviceOrientation.portraitDown,
-  //   ]);
-  //   super.initState();
-  // }
-
-  // @override
-  // dispose() {
-  //   SystemChrome.setPreferredOrientations([
-  //     DeviceOrientation.landscapeRight,
-  //     DeviceOrientation.landscapeLeft,
-  //     DeviceOrientation.portraitUp,
-  //     DeviceOrientation.portraitDown,
-  //   ]);
-  //   super.dispose();
-  // }
-
+  final form = GlobalKey<FormState>();
+  final emailFocus = FocusNode();
   final textFocus = FocusNode();
   final cPassFocus = FocusNode();
   final passFocus = FocusNode();
   final btnFocus = FocusNode();
-  bool visibility = false;
-  bool visibility1 = false;
+  bool visibility = true;
+  bool visibility1 = true;
+  bool isLoading = false;
+  Auth auth = Auth(
+    name: "",
+    email: "",
+    password: "",
+  );
+  final _textEditingController = TextEditingController();
+  final _emailEditingController = TextEditingController();
+  final _passEditingController = TextEditingController();
+  final _passCEditingController = TextEditingController();
+
+  save() async {
+    if (form.currentState!.validate()) {
+      form.currentState!.save();
+      try {
+        setState(() {
+          isLoading = true;
+        });
+        await Provider.of<AuthData>(
+          context,
+          listen: false,
+        ).signUp(auth);
+        setState(() {
+          isLoading = false;
+        });
+      } catch (e) {
+        setState(() {
+          isLoading = false;
+        });
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            content: Text(
+              e.toString(),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+                child: Text("Okay"),
+              ),
+            ],
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final mode = MediaQuery.of(context).orientation == Orientation.landscape;
     final size = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      // resizeToAvoidBottomInset: false,
       body: Container(
         padding: const EdgeInsets.all(
           20.0,
@@ -86,12 +118,54 @@ class _SignUpState extends State<SignUp> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Form(
+                    key: form,
                     child: ListView(
                       children: [
                         SizedBox(
                           height: mode ? size * 0.04 : size * 0.06,
                           child: TextFormField(
+                            controller: _textEditingController,
                             focusNode: textFocus,
+                            textInputAction: TextInputAction.next,
+                            keyboardType: TextInputType.text,
+                            decoration: InputDecoration(
+                              prefixIcon: Icon(
+                                Icons.person,
+                                color: Colors.white,
+                              ),
+                              border: OutlineInputBorder(
+                                gapPadding: 0.0,
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              label: Text(
+                                " User Name",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            onFieldSubmitted: (_) {
+                              FocusScope.of(context).requestFocus(emailFocus);
+                            },
+                            onSaved: (newValue) {
+                              auth = Auth(
+                                name: newValue!,
+                                email: auth.email,
+                                password: auth.password,
+                              );
+                            },
+                            validator: (value) {
+                              return;
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          height: mode ? size * 0.04 : size * 0.01,
+                        ),
+                        SizedBox(
+                          height: mode ? size * 0.04 : size * 0.06,
+                          child: TextFormField(
+                            focusNode: emailFocus,
                             textInputAction: TextInputAction.next,
                             keyboardType: TextInputType.emailAddress,
                             decoration: InputDecoration(
@@ -111,7 +185,15 @@ class _SignUpState extends State<SignUp> {
                               ),
                             ),
                             onFieldSubmitted: (_) {
-                              FocusScope.of(context).requestFocus(passFocus);
+                              FocusScope.of(context).requestFocus();
+                            },
+                            controller: _emailEditingController,
+                            onSaved: (newValue) {
+                              auth = Auth(
+                                name: auth.name,
+                                email: newValue!,
+                                password: auth.password,
+                              );
                             },
                           ),
                         ),
@@ -155,6 +237,24 @@ class _SignUpState extends State<SignUp> {
                             onFieldSubmitted: (_) {
                               FocusScope.of(context).requestFocus(cPassFocus);
                             },
+                            controller: _passEditingController,
+                            onSaved: (newValue) {
+                              auth = Auth(
+                                email: auth.email,
+                                name: auth.name,
+                                password: newValue!,
+                              );
+                            },
+                            validator: (value) {
+                              if (value.toString() == "") {
+                                return "field is empty";
+                              } else if (_passCEditingController.text !=
+                                  value) {
+                                return "Password must be same";
+                              } else {
+                                return null;
+                              }
+                            },
                           ),
                         ),
                         SizedBox(
@@ -197,6 +297,17 @@ class _SignUpState extends State<SignUp> {
                             onFieldSubmitted: (_) {
                               FocusScope.of(context).requestFocus(btnFocus);
                             },
+                            controller: _passCEditingController,
+                            onSaved: (newValue) {},
+                            validator: (value) {
+                              if (value.toString() == "") {
+                                return "field is empty";
+                              } else if (value != _passEditingController.text) {
+                                return "Password must be same";
+                              } else {
+                                return null;
+                              }
+                            },
                           ),
                         ),
                         SizedBox(
@@ -233,22 +344,22 @@ class _SignUpState extends State<SignUp> {
                         SizedBox(
                           height: mode ? size * 0.04 : size * 0.01,
                         ),
-                        OutlinedButton.icon(
+                        OutlinedButton(
                           focusNode: btnFocus,
                           style: OutlinedButton.styleFrom(
                             shape: StadiumBorder(),
                           ),
-                          onPressed: () {},
-                          icon: Icon(
-                            Icons.login,
-                            color: Colors.white,
-                          ),
-                          label: Text(
-                            "SIGN UP",
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
-                          ),
+                          onPressed: () {
+                            save();
+                          },
+                          child: isLoading
+                              ? CircularProgressIndicator()
+                              : Text(
+                                  "SIGN UP",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
                         ),
                       ],
                     ),

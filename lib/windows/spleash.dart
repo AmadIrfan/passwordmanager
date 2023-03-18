@@ -1,7 +1,9 @@
 import 'dart:async';
 
-import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:passwordmanager/windows/home_page.dart';
 
 import '../windows/login.dart';
 import '../styles/properties.dart';
@@ -16,12 +18,23 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    Timer(const Duration(seconds: 7), () {
-      Navigator.pushReplacement(
+    Timer(const Duration(seconds: 3), () {
+      FirebaseAuth user = FirebaseAuth.instance;
+      if (user.currentUser == null) {
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const LogIn(),
-          ));
+            builder: (context) => LogIn(),
+          ),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MyHomePage(),
+          ),
+        );
+      }
     });
     super.initState();
   }

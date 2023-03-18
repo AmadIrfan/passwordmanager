@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:passwordmanager/windows/drawer.dart';
+
+import 'package:passwordmanager/Account/account.dart';
+import 'package:passwordmanager/Account/user_profile.dart';
+
 import '../styles/style.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -16,95 +19,66 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: const Drawer(
-        child: Drawers(),
-      ),
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColor,
-        title: const Text(
-          'Password Manager',
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage(
+            "assets/images/l.jpg",
+          ),
+          fit: BoxFit.cover,
+          opacity: 1.0,
         ),
       ),
-      body: pages[_itemCounter]['page'],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _itemCounter,
-        backgroundColor: Theme.of(context).primaryColor,
-        selectedItemColor: Theme.of(context).primaryColor,
-        unselectedItemColor: Colors.black,
-        onTap: (value) => setState(() {
-          _itemCounter = value;
-        }),
-        items: [
-          BottomNavigationBarItem(
-            icon: const Icon(
-              Icons.key,
-            ),
-            label: pages[0]['title'].toString(),
+      child: Scaffold(
+        drawer: Drawer(
+          child: Accounts(),
+        ),
+        appBar: AppBar(
+          elevation: 0,
+          centerTitle: true,
+
+          //    backgroundColor: Theme.of(context).primaryColor,
+          title: Text(
+            'Password Manager',
+            style: Theme.of(context).appBarTheme.titleTextStyle,
           ),
-          BottomNavigationBarItem(
-            icon: const Icon(
-              Icons.location_on_outlined,
+          actions: [
+            IconButton(
+                onPressed: () {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                        builder: ((context) => UserProfilePage())),
+                  );
+                },
+                icon: Icon(Icons.next_plan))
+          ],
+        ),
+        body: pages[_itemCounter]['page'],
+        bottomNavigationBar: BottomNavigationBar(
+          elevation: 0,
+          currentIndex: _itemCounter,
+          backgroundColor: Colors.transparent,
+          selectedItemColor: Theme.of(context).primaryColor,
+          unselectedItemColor: Colors.black,
+          onTap: (value) => setState(() {
+            _itemCounter = value;
+          }),
+          items: [
+            BottomNavigationBarItem(
+              icon: const Icon(
+                Icons.key,
+              ),
+              label: pages[0]['title'].toString(),
             ),
-            label: pages[1]['title'].toString(),
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(
-              Icons.wysiwyg_sharp,
+            BottomNavigationBarItem(
+              icon: const Icon(
+                Icons.location_on_outlined,
+              ),
+              label: pages[1]['title'].toString(),
             ),
-            label: pages[2]['title'].toString(),
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(
-              Icons.account_circle_outlined,
-            ),
-            label: pages[3]['title'].toString(),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
-//  Column(
-        // children: [
-          // Card(
-          //   elevation: 3,
-          //   margin: const EdgeInsets.all(0),
-          //   child: Container(
-          //     alignment: Alignment.centerLeft,
-          //     width: double.infinity,
-          //     height: 60,
-          //     decoration: BoxDecoration(
-          //       gradient: LinearGradient(
-          //         colors: [
-          //           Colors.greenAccent.withOpacity(0.5),
-          //           Colors.amberAccent.withOpacity(0.5),
-          //           Colors.blue.withOpacity(0.7),
-          //           Colors.blueAccent.withOpacity(0.6),
-          //           Colors.amberAccent.withOpacity(0.5),
-          //           Colors.greenAccent.withOpacity(0.5),
-          //         ],
-          //         begin: Alignment.topLeft,
-          //         end: Alignment.bottomRight,
-          //       ),
-          //     ),
-          //     child: Row(
-          //       crossAxisAlignment: CrossAxisAlignment.center,
-          //       children: [
-          //         IconButton(
-          //           onPressed: () {},
-          //           icon: const Icon(
-          //             Icons.menu,
-          //           ),
-          //         ),
-          //         const SizedBox(
-          //           width: 3,
-          //         ),
-          //         const Text(
-          //           'Password Manager',
-          //           style: styleAppBar,
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),

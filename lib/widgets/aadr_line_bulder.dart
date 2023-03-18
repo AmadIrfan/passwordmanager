@@ -6,7 +6,8 @@ class LineBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 0,
+      color: Theme.of(context).primaryColor,
+      elevation: 3,
       margin: const EdgeInsets.all(1),
       child: Padding(
         padding: const EdgeInsets.all(8.0),

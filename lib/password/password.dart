@@ -19,33 +19,44 @@ class _PasswordScreenState extends State<PasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final listData = Provider.of<PasswordData>(context).passItem;
     return Scaffold(
-      body: listData.isEmpty
-          ? Container(
-              alignment: Alignment.center,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.password,
-                    size: 100,
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text("Password info you add will show hare."),
-                ],
-              ),
-            )
-          : ListView.builder(
-              itemCount: listData.length,
-              itemBuilder: (BuildContext context, int index) {
-                return ChangeNotifierProvider.value(
-                    value: listData[index], child: PAssBuilder());
-              },
-            ),
+      backgroundColor: Colors.transparent,
+      body: FutureBuilder(
+        future: Provider.of<PasswordData>(context, listen: false).fatchDataDB(),
+        builder: (context, snapshot) =>
+            Consumer<PasswordData>(builder: (context, listData, child) {
+          return snapshot.connectionState == ConnectionState.waiting
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
+              : listData.passItem.isEmpty
+                  ? Container(
+                      alignment: Alignment.center,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.password,
+                            size: 100,
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Text("Password info you add will show hare."),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: listData.passItem.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return ChangeNotifierProvider.value(
+                            value: listData.passItem[index],
+                            child: PAssBuilder());
+                      },
+                    );
+        }),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showModalBottomSheet(

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../windows/login.dart';
@@ -12,8 +13,48 @@ class ForGetPassword extends StatefulWidget {
 }
 
 class _ForGetPasswordState extends State<ForGetPassword> {
+  bool loading = false;
   final emailFocus = FocusNode();
   final btnlFocus = FocusNode();
+  final emailController = TextEditingController();
+  final _form = GlobalKey<FormState>();
+  onSave() async {
+    try {
+      FirebaseAuth _auth = FirebaseAuth.instance;
+      bool valid = _form.currentState!.validate();
+      if (valid) {
+        setState(() {
+          loading = true;
+        });
+        await _auth.sendPasswordResetEmail(email: emailController.text);
+        setState(() {
+          loading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        loading = false;
+      });
+      showDialog(
+        context: context,
+        builder: ((context) => AlertDialog(
+              title: Text('Error'),
+              content: Text(
+                e.toString(),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: Text("okey"),
+                ),
+              ],
+            )),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final mode = MediaQuery.of(context).orientation == Orientation.landscape;
@@ -62,11 +103,13 @@ class _ForGetPasswordState extends State<ForGetPassword> {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Form(
+                            key: _form,
                             child: ListView(
                               children: [
                                 SizedBox(
                                   height: mode ? size * 0.1 : size * 0.05,
                                   child: TextFormField(
+                                    controller: emailController,
                                     focusNode: emailFocus,
                                     textInputAction: TextInputAction.done,
                                     keyboardType: TextInputType.emailAddress,
@@ -88,6 +131,13 @@ class _ForGetPasswordState extends State<ForGetPassword> {
                                       FocusScope.of(context).requestFocus(
                                         btnlFocus,
                                       );
+                                    },
+                                    validator: (value) {
+                                      if (!value!.endsWith(".com") ||
+                                          !value.contains("@")) {
+                                        return "please enter valid email";
+                                      }
+                                      return null;
                                     },
                                   ),
                                 ),
@@ -120,19 +170,19 @@ class _ForGetPasswordState extends State<ForGetPassword> {
                                 SizedBox(
                                   height: mode ? size * 0.1 : size * 0.018,
                                 ),
-                                OutlinedButton.icon(
+                                OutlinedButton(
                                   focusNode: btnlFocus,
                                   style: OutlinedButton.styleFrom(
                                       shape: StadiumBorder()),
-                                  onPressed: () {},
-                                  icon: Icon(
-                                    Icons.send,
-                                    color: Colors.white,
-                                  ),
-                                  label: Text(
-                                    "Send",
-                                    style: textStyle,
-                                  ),
+                                  onPressed: () {
+                                    onSave();
+                                  },
+                                  child: loading
+                                      ? CircularProgressIndicator()
+                                      : Text(
+                                          "Send",
+                                          style: textStyle,
+                                        ),
                                 ),
                               ],
                             ),

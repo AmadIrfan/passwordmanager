@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:passwordmanager/models/address.dart';
+import 'package:passwordmanager/notification/push_notification.dart';
 import 'package:provider/provider.dart';
 
 class AddAddress extends StatefulWidget {
@@ -24,6 +25,7 @@ class _AddAddressState extends State<AddAddress> {
   bool inItVal = true;
   Address adrs = Address(
     id: null,
+    uid: '',
     name: "",
     city: "",
     country: "",
@@ -44,7 +46,7 @@ class _AddAddressState extends State<AddAddress> {
     "postalCode": "",
     "streetAddress": "",
   };
-
+  LocalNotification _localNotification = LocalNotification();
   @override
   void dispose() {
     btnNode.dispose();
@@ -57,6 +59,12 @@ class _AddAddressState extends State<AddAddress> {
     postalCodeNode.dispose();
     emailNode.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    _localNotification.initisliseNotification();
+    super.initState();
   }
 
   @override
@@ -95,6 +103,8 @@ class _AddAddressState extends State<AddAddress> {
       } else {
         Provider.of<AddressDate>(context, listen: false).addToList(adrs);
         Navigator.of(context).pop(true);
+        _localNotification.sendNotification("Address Added",
+            "Name : ${adrs.name}\n Email : ${adrs.email}\n Contact : ${adrs.phone}\n City : ${adrs.city}\n");
       }
       Navigator.of(context).pop(true);
     }
@@ -103,6 +113,7 @@ class _AddAddressState extends State<AddAddress> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text("Add Address"),
       ),
@@ -129,6 +140,7 @@ class _AddAddressState extends State<AddAddress> {
                 onSaved: (newValue) {
                   adrs = Address(
                     id: adrs.id,
+                    uid: adrs.id,
                     name: newValue,
                     city: adrs.city,
                     country: adrs.country,
@@ -141,6 +153,12 @@ class _AddAddressState extends State<AddAddress> {
                 },
                 onFieldSubmitted: (value) {
                   FocusScope.of(context).requestFocus(phoneNode);
+                },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Name is required";
+                  }
+                  return null;
                 },
               ),
               SizedBox(
@@ -160,6 +178,7 @@ class _AddAddressState extends State<AddAddress> {
                 onSaved: (newValue) {
                   adrs = Address(
                     id: adrs.id,
+                    uid: adrs.id,
                     name: adrs.name,
                     city: adrs.city,
                     country: adrs.country,
@@ -169,6 +188,13 @@ class _AddAddressState extends State<AddAddress> {
                     postalCode: adrs.postalCode,
                     street_Address: adrs.street_Address,
                   );
+                },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Phone is required";
+                  } else {
+                    return null;
+                  }
                 },
                 onFieldSubmitted: (value) {
                   FocusScope.of(context).requestFocus(emailNode);
@@ -191,6 +217,7 @@ class _AddAddressState extends State<AddAddress> {
                 onSaved: (newValue) {
                   adrs = Address(
                     id: adrs.id,
+                    uid: adrs.id,
                     name: adrs.name,
                     city: adrs.city,
                     country: adrs.country,
@@ -203,6 +230,12 @@ class _AddAddressState extends State<AddAddress> {
                 },
                 onFieldSubmitted: (value) {
                   FocusScope.of(context).requestFocus(countryNode);
+                },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Email is required";
+                  }
+                  return null;
                 },
               ),
               SizedBox(
@@ -222,6 +255,7 @@ class _AddAddressState extends State<AddAddress> {
                 onSaved: (newValue) {
                   adrs = Address(
                     id: adrs.id,
+                    uid: adrs.id,
                     name: adrs.name,
                     city: adrs.city,
                     country: newValue,
@@ -234,6 +268,12 @@ class _AddAddressState extends State<AddAddress> {
                 },
                 onFieldSubmitted: (value) {
                   FocusScope.of(context).requestFocus(street_AddressNode);
+                },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Country name is required";
+                  }
+                  return null;
                 },
               ),
               SizedBox(
@@ -253,6 +293,7 @@ class _AddAddressState extends State<AddAddress> {
                 onSaved: (newValue) {
                   adrs = Address(
                     id: adrs.id,
+                    uid: adrs.id,
                     name: adrs.name,
                     city: adrs.city,
                     country: adrs.country,
@@ -262,6 +303,12 @@ class _AddAddressState extends State<AddAddress> {
                     postalCode: adrs.postalCode,
                     street_Address: newValue,
                   );
+                },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Street address is required";
+                  }
+                  return null;
                 },
                 onFieldSubmitted: (value) {
                   FocusScope.of(context).requestFocus(cityNode);
@@ -284,6 +331,7 @@ class _AddAddressState extends State<AddAddress> {
                 onSaved: (newValue) {
                   adrs = Address(
                     id: adrs.id,
+                    uid: adrs.id,
                     name: adrs.name,
                     city: newValue,
                     country: adrs.country,
@@ -296,6 +344,12 @@ class _AddAddressState extends State<AddAddress> {
                 },
                 onFieldSubmitted: (_) {
                   FocusScope.of(context).requestFocus(orgNode);
+                },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "city is required";
+                  }
+                  return null;
                 },
               ),
               SizedBox(
@@ -315,6 +369,7 @@ class _AddAddressState extends State<AddAddress> {
                 onSaved: (newValue) {
                   adrs = Address(
                     id: adrs.id,
+                    uid: adrs.id,
                     name: adrs.name,
                     city: adrs.city,
                     country: adrs.country,
@@ -327,6 +382,12 @@ class _AddAddressState extends State<AddAddress> {
                 },
                 onFieldSubmitted: (_) {
                   FocusScope.of(context).requestFocus(postalCodeNode);
+                },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Orgnization is required";
+                  }
+                  return null;
                 },
               ),
               SizedBox(
@@ -346,6 +407,7 @@ class _AddAddressState extends State<AddAddress> {
                 onSaved: (newValue) {
                   adrs = Address(
                     id: adrs.id,
+                    uid: adrs.id,
                     name: adrs.name,
                     city: adrs.city,
                     country: adrs.country,
@@ -358,6 +420,12 @@ class _AddAddressState extends State<AddAddress> {
                 },
                 onFieldSubmitted: (_) {
                   FocusScope.of(context).requestFocus(btnNode);
+                },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Postal Code is required";
+                  }
+                  return null;
                 },
               ),
               SizedBox(

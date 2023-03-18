@@ -15,7 +15,7 @@ class PassPageDetails extends StatefulWidget {
 }
 
 class _PassPageDetailsState extends State<PassPageDetails> {
-  bool visibility = false;
+  bool visibility = true;
   TextEditingController nameController = TextEditingController();
   TextEditingController webController = TextEditingController();
   TextEditingController passController = TextEditingController();
@@ -33,6 +33,8 @@ class _PassPageDetailsState extends State<PassPageDetails> {
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
+            //     backgroundColor: Colors.transparent,
+            centerTitle: true,
             actions: [
               IconButton(
                 onPressed: () {

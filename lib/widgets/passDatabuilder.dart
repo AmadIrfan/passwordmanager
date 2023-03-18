@@ -66,24 +66,29 @@ class _PAssBuilderState extends State<PAssBuilder> {
         Slidable(
           endActionPane: acp,
           startActionPane: acp,
-          child: ListTile(
-            onTap: () {
-              Navigator.pushNamed(context, PassPageDetails.routeName,
-                  arguments: e.id!);
-            },
-            leading: CircleAvatar(
-              child: Text(
-                item.getChar(e.uName!),
+          child: Card(
+            elevation: 3,
+            margin: const EdgeInsets.all(0),
+            color: Theme.of(context).primaryColor,
+            child: ListTile(
+              onTap: () {
+                Navigator.pushNamed(context, PassPageDetails.routeName,
+                    arguments: e.id!);
+              },
+              leading: CircleAvatar(
+                child: Text(
+                  item.getChar(e.uName!),
+                ),
               ),
-            ),
-            title: Text(e.webSite!),
-            subtitle: Text(
-              DateFormat.yMMMMEEEEd().format(e.addedDate!),
+              title: Text(e.webSite!),
+              subtitle: Text(
+                DateFormat.yMMMMEEEEd().format(e.addedDate!),
+              ),
             ),
           ),
         ),
-        const Divider(
-          thickness: 2,
+        SizedBox(
+          height: 2,
         ),
       ],
     );
